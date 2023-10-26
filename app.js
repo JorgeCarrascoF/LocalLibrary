@@ -7,13 +7,24 @@ var logger = require('morgan');
 var indexRouter = require('./routes/index');
 var usersRouter = require('./routes/users');
 const catalogRouter = require('./routes/catalog');
+const compression = require('compression'); // compress routes
+const helmet = require('helmet') //protection against vulnerabilities
+const RateLimit = require('express-rate-limit'); // limit repeated requests to APIs and endpoints
 
 var app = express();
+//Set a rate limiter: maximum of twenty requests per minute
+const limiter = RateLimit({
+  windowsMs: 1 * 60 * 1000, // 1 minute
+  max: 20
+})
 
 // Set up mongoose connection
 const mongoose = require('mongoose');
 mongoose.set("strictQuery", false);
-const mongoDB = 'mongodb+srv://admin:ia9EJDqcmZqEvVvE@cluster0.wol7ewr.mongodb.net/local_library?retryWrites=true&w=majority'
+
+
+const dev_db_url = 'mongodb+srv://admin:ia9EJDqcmZqEvVvE@cluster0.wol7ewr.mongodb.net/local_library?retryWrites=true&w=majority'
+const mongoDB = process.env.MONGODB_URI || dev_db_url
 
 main().catch((err) => console.log(err));
 async function main(){
@@ -23,6 +34,19 @@ async function main(){
 // view engine setup
 app.set('views', path.join(__dirname, 'views'));
 app.set('view engine', 'pug');
+
+
+app.use(compression());
+// add helmet to the middleware chain
+// Set CPS headers to allow our Bootstrap and JQuery to be served
+app.use(
+  helmet.contentSecurityPolicy({
+    directives:{
+      "script-src": ["'self'", "code.jquery.com", "cdn.jsdelivr.net"]
+    }
+  })
+)
+app.use(limiter)
 
 app.use(logger('dev'));
 app.use(express.json());
