@@ -120,6 +120,7 @@ exports.bookinstance_update_get = asyncHandler(async (req, res, next) => {
   res.render("bookinstance_form", {
     title: "Update book instance",
     bookinstance: bookinstance,
+    selected_book: bookinstance.book._id,
     book_list: allBooks,
   });
 });
