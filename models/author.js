@@ -32,4 +32,12 @@ AuthorSquema.virtual('deathdate').get(function (){
     return this.date_of_death ? DateTime.fromJSDate(this.date_of_death).toLocaleString(DateTime.DATE_MED) : '';
 })
 
+AuthorSquema.virtual('birthdate_form').get(function (){
+    return DateTime.fromJSDate(this.date_of_birth).toISODate() // Format YYYY-MM-DD
+})
+
+AuthorSquema.virtual('deathdate_form').get(function (){
+    return DateTime.fromJSDate(this.date_of_death).toISODate() // Format YYYY-MM-DD
+})
+
 module.exports = mongoose.model("Author", AuthorSquema);

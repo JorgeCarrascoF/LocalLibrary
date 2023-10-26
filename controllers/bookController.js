@@ -143,18 +143,18 @@ exports.book_create_post = [
 exports.book_delete_get = asyncHandler(async (req, res, next) => {
   const [book, allInstancesOfBook] = await Promise.all([
     Book.findById(req.params.id).exec(),
-    BookInstance.find({book: req.params.id}).exec(),
-  ])
+    BookInstance.find({ book: req.params.id }).exec(),
+  ]);
 
-  if(book === null) {
-    res.redirect('/catalog/books')
+  if (book === null) {
+    res.redirect("/catalog/books");
   }
 
-  res.render('book_delete', {
-    title: 'Delete book',
+  res.render("book_delete", {
+    title: "Delete book",
     book: book,
-    book_instances: allInstancesOfBook
-  })
+    book_instances: allInstancesOfBook,
+  });
 
   res.send("NOT IMPLEMENTED: book delete GET");
 });
@@ -163,18 +163,18 @@ exports.book_delete_get = asyncHandler(async (req, res, next) => {
 exports.book_delete_post = asyncHandler(async (req, res, next) => {
   const [book, allInstancesOfBook] = await Promise.all([
     Book.findById(req.params.id).exec(),
-    BookInstance.find({book: req.params.id}).exec()
-  ])
+    BookInstance.find({ book: req.params.id }).exec(),
+  ]);
 
-  if(allInstancesOfBook.length > 0){
-    res.render('book_delete', {
-      title: 'Delete book',
+  if (allInstancesOfBook.length > 0) {
+    res.render("book_delete", {
+      title: "Delete book",
       book: book,
       author_books: allInstancesOfBook,
-    })
+    });
   } else {
     await Book.findByIdAndRemove(req.body.bookid),
-    res.redirect('/catalog/books')
+      res.redirect("/catalog/books");
   }
 });
 
@@ -241,33 +241,31 @@ exports.book_update_post = [
       author: req.body.author,
       summary: req.body.summary,
       isbn: req.body.isbn,
-      genre: typeof req.body.genre === 'undefined' ? [] : req.body.genre,
+      genre: typeof req.body.genre === "undefined" ? [] : req.body.genre,
       _id: req.params.id,
-    })
+    });
 
-    if(!errors.isEmpty()){
+    if (!errors.isEmpty()) {
       const [allAuthors, allGenres] = await Promise.all([
         Author.find().exec(),
-        Genre.find().exec()
-      ])
-      for(const genre of allGenres){
-          if(book.genre.indexOf(genre._id) > -1){
-            genre.checked = 'true';
-          }
+        Genre.find().exec(),
+      ]);
+      for (const genre of allGenres) {
+        if (book.genre.indexOf(genre._id) > -1) {
+          genre.checked = "true";
+        }
       }
-      res.render('book_form', {
-        title: 'Update Book',
+      res.render("book_form", {
+        title: "Update Book",
         authors: allAuthors,
         genres: allGenres,
         book: book,
         errors: errors.array(),
-      })
+      });
       return;
     } else {
       const updatedBook = await Book.findByIdAndUpdate(req.params.id, book, {});
-      res.redirect(updatedBook.url)
+      res.redirect(updatedBook.url);
     }
-
-
   }),
 ];
